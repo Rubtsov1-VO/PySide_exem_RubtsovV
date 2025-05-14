@@ -7,7 +7,7 @@ PySide6-uic path_to_form.ui -o path_to_form.py
 
 from PySide6 import QtWidgets
 
-from ui.a_add_ui_form import Ui_MainWindow  # Импортируем класс формы
+from g_calculator import Ui_Dialog  # Импортируем класс формы
 
 
 class Window(QtWidgets.QMainWindow):  # наследуемся от того же класса, что и форма в QtDesigner
@@ -15,7 +15,7 @@ class Window(QtWidgets.QMainWindow):  # наследуемся от того ж�
         super().__init__(parent)
 
         # Создание "прокси" переменной для работы с формой
-        self.ui = Ui_MainWindow()
+        self.ui = Ui_Dialog()
         self.ui.setupUi(self)
 
 
