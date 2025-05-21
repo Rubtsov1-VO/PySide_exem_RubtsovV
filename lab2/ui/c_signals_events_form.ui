@@ -29,7 +29,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QPushButton" name="pushButtonLT">
+         <widget class="QPushButton" name="LeftUp">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -42,7 +42,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonRT">
+         <widget class="QPushButton" name="RightUp">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -72,7 +72,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QPushButton" name="pushButtonLB">
+         <widget class="QPushButton" name="LeftDown">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -85,7 +85,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonRB">
+         <widget class="QPushButton" name="RightDown">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -108,7 +108,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="labelX">
              <property name="text">
               <string>X</string>
              </property>
@@ -118,7 +118,7 @@
             <widget class="QSpinBox" name="spinBoxX"/>
            </item>
            <item>
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="labelY">
              <property name="text">
               <string>Y</string>
              </property>
@@ -130,7 +130,7 @@
           </layout>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButtonMoveCoords">
+          <widget class="QPushButton" name="Move">
            <property name="text">
             <string>Переместить</string>
            </property>
@@ -142,7 +142,7 @@
       <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -164,7 +164,7 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QPlainTextEdit" name="plainTextEdit">
+         <widget class="QPlainTextEdit" name="TextUp">
           <property name="minimumSize">
            <size>
             <width>200</width>
@@ -177,7 +177,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButtonGetData">
+      <widget class="QPushButton" name="GetdatafromWindow">
        <property name="text">
         <string>Получить данные окна</string>
        </property>
