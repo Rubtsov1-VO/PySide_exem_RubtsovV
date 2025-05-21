@@ -53,14 +53,13 @@ class WeatherApp(QMainWindow):
                 self.result_browser.setPlainText("Некорректный ключ API")
             elif response.status_code == 403:
                 self.result_browser.setPlainText("Нет доступа до сайта")
-            elif response.status_code == 401:
-                self.result_browser.setPlainText("Некорректный ключ API")
             else:
                 self.result_browser.setPlainText("Город не найден.")
         else:
             self.result_browser.setPlainText("Пожалуйста, введите название города.")
 
-    def format_weather_info(self, data):
+    @staticmethod
+    def format_weather_info(data):
         city = data['name']
         country = data['sys']['country']
         temperature = data['main']['temp']
