@@ -35,9 +35,6 @@ class WeatherApp(QMainWindow):
     def init_signal(self) -> None:
         self.get_weather_button.clicked.connect(self.get_weather)
 
-    def get_weather(self) -> None:
-        self.plainTextEditLog.setPlainText(self.get_weather.text())
-
     def get_weather(self):
         if self.city_input.text():
             url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city_input.text()}&appid={API_KEY}&units=metric"
