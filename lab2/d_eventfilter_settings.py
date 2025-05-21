@@ -33,8 +33,8 @@ class MainWindow(QWidget):
         self.lcd_number = QLCDNumber()
         self.combo_box = QComboBox()
 
-        self.dial.setRange(0, 99)
-        self.slider.setRange(0, 99)
+        self.dial.setRange(0, 20)
+        self.slider.setRange(0, 20)
         self.lcd_number.setSegmentStyle(QLCDNumber.Flat)
 
         self.combo_box.addItems(["Dec", "Hex", "Bin", "Oct"])
