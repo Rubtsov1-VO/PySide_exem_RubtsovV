@@ -98,15 +98,15 @@ class MainWindow(QtWidgets.QMainWindow):
         output += f"  - Координаты центра приложения: {center.x()}, {center.y()}\n"
 
         if self.isMinimized():
-            output += "  - Состояние окна: Свернуто\n"
+            output += "  - Состояние окна: Свернуто\n" + timestamp
         elif self.isMaximized():
-            output += "  - Состояние окна: Развернуто\n"
+            output += "  - Состояние окна: Развернуто\n" + timestamp
         elif self.isActiveWindow():
-            output += "  - Состояние окна: Активно\n"
+            output += "  - Состояние окна: Активно\n" + timestamp
         elif self.isVisible():
-            output += "  - Состояние окна: Отображено\n"
+            output += "  - Состояние окна: Отображено\n" + timestamp
         else:
-            output += "  - Состояние окна: Неизвестно\n"
+            output += "  - Состояние окна: Неизвестно\n" + timestamp
 
         self.plain_text_edit.appendPlainText(output)
         self.plain_text_edit.ensureCursorVisible()
