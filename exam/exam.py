@@ -1,5 +1,7 @@
 import sys
 import requests
+from api_key import API_KEY
+
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -9,9 +11,6 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QTextBrowser,
 )
-
-API_KEY = 'baba2e91349e34132c0cf9f53b611283'
-
 
 class WeatherApp(QMainWindow):
     def __init__(self):
@@ -28,10 +27,16 @@ class WeatherApp(QMainWindow):
         self.city_input.setPlaceholderText("Введите название города")
         layout.addWidget(self.city_input)
         self.get_weather_button = QPushButton("Получить погоду", self)
-        self.get_weather_button.clicked.connect(self.get_weather)
         layout.addWidget(self.get_weather_button)
         self.result_browser = QTextBrowser(self)
         layout.addWidget(self.result_browser)
+        self.init_signal()
+
+    def init_signal(self) -> None:
+        self.get_weather_button.clicked.connect(self.get_weather)
+
+    def get_weather(self) -> None:
+        self.plainTextEditLog.setPlainText(self.get_weather.text())
 
     def get_weather(self):
         city = self.city_input.text()
@@ -42,6 +47,14 @@ class WeatherApp(QMainWindow):
                 data = response.json()
                 weather_info = self.format_weather_info(data)
                 self.result_browser.setPlainText(weather_info)
+            elif response.status_code == 500:
+                self.result_browser.setPlainText("Сайт сломан")
+            elif response.status_code == 401:
+                self.result_browser.setPlainText("Некорректный ключ API")
+            elif response.status_code == 403:
+                self.result_browser.setPlainText("Нет доступа до сайта")
+            elif response.status_code == 401:
+                self.result_browser.setPlainText("Некорректный ключ API")
             else:
                 self.result_browser.setPlainText("Город не найден.")
         else:
