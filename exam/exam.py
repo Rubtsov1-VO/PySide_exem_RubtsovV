@@ -39,9 +39,8 @@ class WeatherApp(QMainWindow):
         self.plainTextEditLog.setPlainText(self.get_weather.text())
 
     def get_weather(self):
-        city = self.city_input.text()
-        if city:
-            url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+        if self.city_input.text():
+            url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city_input.text()}&appid={API_KEY}&units=metric"
             response = requests.get(url)
             if response.status_code == 200:
                 data = response.json()

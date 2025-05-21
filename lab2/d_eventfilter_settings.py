@@ -18,62 +18,101 @@
    в него соответствующие значения
 """
 
-from PySide6 import QtWidgets, QtCore
+import sys
+
+from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
+                            QDial, QSlider, QLCDNumber, QComboBox, QLabel)
+from PyQt5.QtCore import Qt, QSettings
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.dial = QDial()
+        self.slider = QSlider(Qt.Horizontal)
+        self.lcd_number = QLCDNumber()
+        self.combo_box = QComboBox()
+
+        self.dial.setRange(0, 99)
+        self.slider.setRange(0, 99)
+        self.lcd_number.setSegmentStyle(QLCDNumber.Flat)
+
+        self.combo_box.addItems(["Dec", "Hex", "Bin", "Oct"])
+        self.combo_box.currentIndexChanged.connect(self.update_lcd_display)
+
+        self.settings = QSettings("MyApplication", "LCDSettings")
+        self.load_settings()
 
 
-class Window(QtWidgets.QWidget):
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        l = QtWidgets.QVBoxLayout()
-
-        self.lcd_modes = {
-            "hex": QtWidgets.QLCDNumber.Mode.Hex,
-            "dec": QtWidgets.QLCDNumber.Mode.Dec,
-            "oct": QtWidgets.QLCDNumber.Mode.Oct,
-            "bin": QtWidgets.QLCDNumber.Mode.Bin,
-        }
-
-        self.dial = QtWidgets.QDial()
-        self.dial.valueChanged.connect(self.onValueChanged)
-        self.dial.installEventFilter(self)
-        self.lcd = QtWidgets.QLCDNumber()
-        self.lcd.display(14)
-        self.lcd.setMinimumHeight(60)
-        self.slider = QtWidgets.QSlider()
-        self.slider.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        self.slider.valueChanged.connect(self.onValueChanged)
-        self.cb = QtWidgets.QComboBox()
-        self.cb.addItems(list(self.lcd_modes.keys()))
-        self.cb.currentTextChanged.connect(lambda mode: self.lcd.setMode(self.lcd_modes[mode]))
-
-        l.addWidget(self.dial)
-        l.addWidget(self.lcd)
-        l.addWidget(self.slider)
-        l.addWidget(self.cb)
-
-        self.setLayout(l)
-
-    def onValueChanged(self, value):
-        self.dial.setValue(value)
-        self.slider.setValue(value)
-
-    def eventFilter(self, watched, event):
-        if watched == self.dial and event.type() == QtCore.QEvent.Type.KeyPress:
-            if event.key() == QtCore.Qt.Key.Key_Minus:
-                self.dial.setValue(self.dial.value()-1)
-            elif event.key() == QtCore.Qt.Key.Key_Plus:
-                self.dial.setValue(self.dial.value() + 1)
-
-        return super().eventFilter(watched, event)
+        self.dial.valueChanged.connect(self.slider.setValue)
+        self.dial.valueChanged.connect(self.lcd_number.display)
+        self.slider.valueChanged.connect(self.dial.setValue)
+        self.slider.valueChanged.connect(self.lcd_number.display)
+        self.lcd_number.overflow.connect(self.handle_overflow)
 
 
+        h_layout = QHBoxLayout()
+        h_layout.addWidget(QLabel("Dial:"))
+        h_layout.addWidget(self.dial)
+        h_layout.addWidget(QLabel("Slider:"))
+        h_layout.addWidget(self.slider)
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication()
+        v_layout = QVBoxLayout()
+        v_layout.addLayout(h_layout)
+        v_layout.addWidget(QLabel("LCD Number:"))
+        v_layout.addWidget(self.lcd_number)
+        v_layout.addWidget(QLabel("Display Mode:"))
+        v_layout.addWidget(self.combo_box)
 
-    window = Window()
+        self.setLayout(v_layout)
+        self.dial.setFocusPolicy(Qt.StrongFocus)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Plus:
+            self.dial.setValue(min(self.dial.value() + 1, self.dial.maximum()))
+            print(f"Dial value increased: {self.dial.value()}")  # Вывод в консоль
+        elif event.key() == Qt.Key_Minus:
+            self.dial.setValue(max(self.dial.value() - 1, self.dial.minimum()))
+            print(f"Dial value decreased: {self.dial.value()}")  # Вывод в консоль
+        else:
+            super().keyPressEvent(event)
+
+    def update_lcd_display(self, index):
+        value = self.lcd_number.value()
+        if index == 0:  # Dec
+            self.lcd_number.setDecMode()
+        elif index == 1:  # Hex
+            self.lcd_number.setHexMode()
+        elif index == 2:  # Bin
+            self.lcd_number.setBinMode()
+        elif index == 3:  # Oct
+            self.lcd_number.setOctMode()
+
+        self.lcd_number.display(value)
+
+    def load_settings(self):
+        display_mode_index = self.settings.value("display_mode", 0, type=int)
+        lcd_value = self.settings.value("lcd_value", 0, type=int)
+
+        self.combo_box.setCurrentIndex(display_mode_index)
+        self.update_lcd_display(display_mode_index)
+        self.dial.setValue(lcd_value)
+        self.slider.setValue(lcd_value)
+        self.lcd_number.display(lcd_value)
+
+    def save_settings(self):
+        self.settings.setValue("display_mode", self.combo_box.currentIndex())
+        self.settings.setValue("lcd_value", self.lcd_number.value())
+
+    def closeEvent(self, event):
+        self.save_settings()
+        super().closeEvent(event)
+
+    def handle_overflow(self):
+        print("LCD Number Overflow!")
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MainWindow()
     window.show()
-
-    app.exec()
+    sys.exit(app.exec())

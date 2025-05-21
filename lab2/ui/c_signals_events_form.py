@@ -24,7 +24,7 @@ class Ui_Form(object):
         if not Form.objectName():
             Form.setObjectName(u"Form")
         Form.resize(837, 578)
-        Form.setMinimumSize(QSize(700, 450))
+        Form.setMinimumSize(QSize(700, 400))
         self.horizontalLayout = QHBoxLayout(Form)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.groupBox_2 = QGroupBox(Form)
