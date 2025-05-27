@@ -1,73 +1,70 @@
 import sys
 import requests
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit
+from PyQt6.QtCore import QThread, pyqtSignal
 from api_key import API_KEY
 
-from PyQt6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QVBoxLayout,
-    QWidget,
-    QLineEdit,
-    QPushButton,
-    QTextBrowser,
-)
+class WeatherThread(QThread):
+    weather_updated = pyqtSignal(str)
 
-class WeatherApp(QMainWindow):
+    def __init__(self, city):
+        super().__init__()
+        self.city = city
+
+    def run(self):
+        url = f'http://api.openweathermap.org/data/2.5/weather?q={self.city}&appid={API_KEY}&units=metric'
+
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            weather = f"Город: {data['name']}, Температура: {data['main']['temp']}°C, Погода: {data['weather'][0]['description']}"
+            self.weather_updated.emit(weather)
+        elif response.status_code == 500:
+            self.weather_updated.emit("Сайт сломан")
+        elif response.status_code == 401:
+            self.weather_updated.emit("Некорректный ключ API")
+        elif response.status_code == 403:
+            self.weather_updated.emit("Нет доступа до сайта")
+        else:
+            self.weather_updated.emit("Город не найден.")
+
+
+
+class WeatherApp(QWidget):
     def __init__(self):
-        super(WeatherApp, self).__init__()
-        self.setWindowTitle("Приложение погоды")
-        self.setGeometry(100, 100, 400, 300)
-        self.init_ui()
+        super().__init__()
+        self.initUI()
 
-    def init_ui(self):
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-        layout = QVBoxLayout(self.central_widget)
+    def initUI(self):
+        self.layout = QVBoxLayout()
+        self.setGeometry(100, 100, 300, 300)
         self.city_input = QLineEdit(self)
-        self.city_input.setPlaceholderText("Введите название города")
-        layout.addWidget(self.city_input)
-        self.get_weather_button = QPushButton("Получить погоду", self)
-        layout.addWidget(self.get_weather_button)
-        self.result_browser = QTextBrowser(self)
-        layout.addWidget(self.result_browser)
-        self.init_signal()
+        self.city_input.setPlaceholderText('Введите название города')
+        self.layout.addWidget(self.city_input)
 
-    def init_signal(self) -> None:
-        self.get_weather_button.clicked.connect(self.get_weather)
+        self.button = QPushButton('Получить погоду', self)
+        self.button.clicked.connect(self.get_weather)
+        self.layout.addWidget(self.button)
+
+        self.label = QLabel('Погода будет отображена здесь...')
+        self.layout.addWidget(self.label)
+
+        self.setLayout(self.layout)
+        self.setWindowTitle("Приложение погоды")
+
 
     def get_weather(self):
-        if self.city_input.text():
-            url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city_input.text()}&appid={API_KEY}&units=metric"
-            response = requests.get(url)
-            if response.status_code == 200:
-                data = response.json()
-                weather_info = self.format_weather_info(data)
-                self.result_browser.setPlainText(weather_info)
-            elif response.status_code == 500:
-                self.result_browser.setPlainText("Сайт сломан")
-            elif response.status_code == 401:
-                self.result_browser.setPlainText("Некорректный ключ API")
-            elif response.status_code == 403:
-                self.result_browser.setPlainText("Нет доступа до сайта")
-            else:
-                self.result_browser.setPlainText("Город не найден.")
-        else:
-            self.result_browser.setPlainText("Пожалуйста, введите название города.")
+        city = self.city_input.text()
+        if city:
+            self.thread = WeatherThread(city)
+            self.thread.weather_updated.connect(self.update_weather)
+            self.thread.start()
 
-    @staticmethod
-    def format_weather_info(data):
-        city = data['name']
-        country = data['sys']['country']
-        temperature = data['main']['temp']
-        weather = data['weather'][0]['description']
-
-        weather_info = (f"Город: {city}, {country}\n"
-                        f"Температура: {temperature}°C\n"
-                        f"Погода: {weather.capitalize()}")
-        return weather_info
+    def update_weather(self, weather):
+        self.label.setText(weather)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = WeatherApp()
     window.show()
